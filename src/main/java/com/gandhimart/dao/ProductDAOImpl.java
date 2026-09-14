@@ -4,11 +4,11 @@ import com.gandhimart.model.Product;
 import com.gandhimart.util.DatabaseConfig;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.math.BigDecimal;
 
 public class ProductDAOImpl implements ProductDAO {
 
@@ -23,7 +23,7 @@ public class ProductDAOImpl implements ProductDAO {
 
         String sql = """
                 INSERT INTO products
-                (seller_id, name, description, price, stock)
+                (seller_id, name, description, price, stock_quantity)
                 VALUES (?, ?, ?, ?, ?)
                 """;
 
@@ -49,7 +49,8 @@ public class ProductDAOImpl implements ProductDAO {
                 SET name = ?,
                     description = ?,
                     price = ?,
-                    stock = ?
+                    stock_quantity = ?,
+                    updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
                   AND seller_id = ?
                 """;
@@ -99,7 +100,7 @@ public class ProductDAOImpl implements ProductDAO {
                        name,
                        description,
                        price,
-                       stock,
+                       stock_quantity,
                        created_at
                 FROM products
                 WHERE id = ?
@@ -132,7 +133,7 @@ public class ProductDAOImpl implements ProductDAO {
                        name,
                        description,
                        price,
-                       stock,
+                       stock_quantity,
                        created_at
                 FROM products
                 WHERE seller_id = ?
@@ -158,17 +159,117 @@ public class ProductDAOImpl implements ProductDAO {
         return products;
     }
 
+    @Override
+    public List<Product> findAll() throws SQLException {
+
+        String sql = """
+                SELECT id,
+                       seller_id,
+                       name,
+                       description,
+                       price,
+                       stock_quantity,
+                       created_at
+                FROM products
+                ORDER BY created_at DESC
+                """;
+
+        List<Product> products = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement =
+                     connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                products.add(mapProduct(resultSet));
+            }
+        }
+
+        return products;
+    }
+
+    @Override
+    public List<Product> search(
+            String keyword,
+            BigDecimal minPrice,
+            BigDecimal maxPrice) throws SQLException {
+
+        StringBuilder sql = new StringBuilder("""
+                SELECT id,
+                       seller_id,
+                       name,
+                       description,
+                       price,
+                       stock_quantity,
+                       created_at
+                FROM products
+                WHERE 1 = 1
+                """);
+
+        List<Object> parameters = new ArrayList<>();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND LOWER(name) LIKE ?");
+            parameters.add(
+                    "%" + keyword.trim().toLowerCase() + "%"
+            );
+        }
+
+        if (minPrice != null) {
+            sql.append(" AND price >= ?");
+            parameters.add(minPrice);
+        }
+
+        if (maxPrice != null) {
+            sql.append(" AND price <= ?");
+            parameters.add(maxPrice);
+        }
+
+        sql.append(" ORDER BY created_at DESC");
+
+        List<Product> products = new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement =
+                     connection.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < parameters.size(); i++) {
+                statement.setObject(i + 1, parameters.get(i));
+            }
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    products.add(mapProduct(resultSet));
+                }
+            }
+        }
+
+        return products;
+    }
+
     private Product mapProduct(ResultSet resultSet)
             throws SQLException {
 
         Product product = new Product();
 
         product.setId(resultSet.getLong("id"));
-        product.setSellerId(resultSet.getLong("seller_id"));
-        product.setName(resultSet.getString("name"));
-        product.setDescription(resultSet.getString("description"));
-        product.setPrice(resultSet.getBigDecimal("price"));
-        product.setStock(resultSet.getInt("stock"));
+        product.setSellerId(
+                resultSet.getLong("seller_id")
+        );
+        product.setName(
+                resultSet.getString("name")
+        );
+        product.setDescription(
+                resultSet.getString("description")
+        );
+        product.setPrice(
+                resultSet.getBigDecimal("price")
+        );
+        product.setStock(
+                resultSet.getInt("stock_quantity")
+        );
 
         Timestamp timestamp =
                 resultSet.getTimestamp("created_at");
@@ -181,92 +282,4 @@ public class ProductDAOImpl implements ProductDAO {
 
         return product;
     }
-
-    @Override
-public List<Product> findAll() throws SQLException {
-
-    String sql = """
-            SELECT id,
-                   seller_id,
-                   name,
-                   description,
-                   price,
-                   stock,
-                   created_at
-            FROM products
-            ORDER BY created_at DESC
-            """;
-
-    List<Product> products = new ArrayList<>();
-
-    try (Connection connection = dataSource.getConnection();
-         PreparedStatement statement =
-                 connection.prepareStatement(sql);
-         ResultSet resultSet = statement.executeQuery()) {
-
-        while (resultSet.next()) {
-            products.add(mapProduct(resultSet));
-        }
-    }
-
-    return products;
-}
-
-@Override
-public List<Product> search(
-        String keyword,
-        BigDecimal minPrice,
-        BigDecimal maxPrice) throws SQLException {
-
-    StringBuilder sql = new StringBuilder("""
-            SELECT id,
-                   seller_id,
-                   name,
-                   description,
-                   price,
-                   stock,
-                   created_at
-            FROM products
-            WHERE 1 = 1
-            """);
-
-    List<Object> parameters = new ArrayList<>();
-
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        sql.append(" AND LOWER(name) LIKE ?");
-        parameters.add("%" + keyword.trim().toLowerCase() + "%");
-    }
-
-    if (minPrice != null) {
-        sql.append(" AND price >= ?");
-        parameters.add(minPrice);
-    }
-
-    if (maxPrice != null) {
-        sql.append(" AND price <= ?");
-        parameters.add(maxPrice);
-    }
-
-    sql.append(" ORDER BY created_at DESC");
-
-    List<Product> products = new ArrayList<>();
-
-    try (Connection connection = dataSource.getConnection();
-         PreparedStatement statement =
-                 connection.prepareStatement(sql.toString())) {
-
-        for (int i = 0; i < parameters.size(); i++) {
-            statement.setObject(i + 1, parameters.get(i));
-        }
-
-        try (ResultSet resultSet = statement.executeQuery()) {
-
-            while (resultSet.next()) {
-                products.add(mapProduct(resultSet));
-            }
-        }
-    }
-
-    return products;
-}
 }
