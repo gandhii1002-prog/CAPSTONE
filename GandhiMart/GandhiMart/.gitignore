@@ -1,0 +1,24 @@
+# Maven
+target/
+*.class
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Local environment files
+.env
+
+# Local H2 database
+*.mv.db
+*.trace.db
+*.lock.db

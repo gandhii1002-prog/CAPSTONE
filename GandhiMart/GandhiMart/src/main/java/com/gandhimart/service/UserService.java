@@ -61,27 +61,4 @@ public class UserService {
 
         userDAO.create(user);
     }
-
-    public User login(String email, String password) throws SQLException {
-
-    if (email == null || email.trim().isEmpty()) {
-        throw new IllegalArgumentException("Email is required");
-    }
-
-    if (password == null || password.isEmpty()) {
-        throw new IllegalArgumentException("Password is required");
-    }
-
-    email = email.trim().toLowerCase();
-
-    User user = userDAO.findByEmail(email)
-            .orElseThrow(() ->
-                    new IllegalArgumentException("Invalid email or password"));
-
-    if (!BCrypt.checkpw(password, user.getPasswordHash())) {
-        throw new IllegalArgumentException("Invalid email or password");
-    }
-
-    return user;
-}
 }
