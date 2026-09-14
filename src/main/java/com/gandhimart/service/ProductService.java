@@ -180,4 +180,42 @@ public class ProductService {
             );
         }
     }
+
+    public List<Product> getAllProducts() throws SQLException {
+    return productDAO.findAll();
+}
+
+public List<Product> searchProducts(
+        String keyword,
+        BigDecimal minPrice,
+        BigDecimal maxPrice) throws SQLException {
+
+    if (minPrice != null &&
+            minPrice.compareTo(BigDecimal.ZERO) < 0) {
+        throw new IllegalArgumentException(
+                "Minimum price cannot be negative"
+        );
+    }
+
+    if (maxPrice != null &&
+            maxPrice.compareTo(BigDecimal.ZERO) < 0) {
+        throw new IllegalArgumentException(
+                "Maximum price cannot be negative"
+        );
+    }
+
+    if (minPrice != null &&
+            maxPrice != null &&
+            minPrice.compareTo(maxPrice) > 0) {
+        throw new IllegalArgumentException(
+                "Minimum price cannot be greater than maximum price"
+        );
+    }
+
+    return productDAO.search(
+            keyword,
+            minPrice,
+            maxPrice
+    );
+}
 }
