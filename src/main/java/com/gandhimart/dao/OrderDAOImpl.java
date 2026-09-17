@@ -1,5 +1,6 @@
 package com.gandhimart.dao;
 
+import com.gandhimart.dto.SellerOrderItem;
 import com.gandhimart.model.Order;
 import com.gandhimart.util.DatabaseConfig;
 
@@ -308,6 +309,186 @@ public class OrderDAOImpl implements OrderDAO {
         }
 
         return Optional.empty();
+    }
+
+        @Override
+        public List<Order> findByBuyerId(Long buyerId)
+                        throws SQLException {
+
+                String sql = """
+                                SELECT
+                                        id,
+                                        buyer_id,
+                                        status,
+                                        total_amount,
+                                        created_at
+                                FROM orders
+                                WHERE buyer_id = ?
+                                ORDER BY created_at DESC
+                                """;
+
+                List<Order> orders = new ArrayList<>();
+
+                try (Connection connection =
+                                         dataSource.getConnection();
+                         PreparedStatement statement =
+                                         connection.prepareStatement(sql)) {
+
+                        statement.setLong(1, buyerId);
+
+                        try (ResultSet resultSet =
+                                                 statement.executeQuery()) {
+
+                                while (resultSet.next()) {
+                                        orders.add(
+                                                        mapOrder(resultSet)
+                                        );
+                                }
+                        }
+                }
+
+                return orders;
+        }
+
+    @Override
+    public List<SellerOrderItem> findIncomingBySellerId(
+            Long sellerId) throws SQLException {
+
+        String sql = """
+                SELECT
+                    o.id AS order_id,
+                    o.buyer_id,
+                    u.name AS buyer_name,
+                    o.status,
+                    o.payment_status,
+                    oi.product_id,
+                    p.name AS product_name,
+                    oi.quantity,
+                    oi.unit_price,
+                    (oi.quantity * oi.unit_price) AS subtotal,
+                    o.total_amount AS order_total,
+                    o.created_at
+                FROM orders o
+                JOIN users u
+                    ON u.id = o.buyer_id
+                JOIN order_items oi
+                    ON oi.order_id = o.id
+                JOIN products p
+                    ON p.id = oi.product_id
+                WHERE p.seller_id = ?
+                ORDER BY o.created_at DESC,
+                         o.id DESC
+                """;
+
+        List<SellerOrderItem> orders =
+                new ArrayList<>();
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.setLong(1, sellerId);
+
+            try (ResultSet resultSet =
+                         statement.executeQuery()) {
+
+                while (resultSet.next()) {
+
+                    SellerOrderItem item =
+                            new SellerOrderItem();
+
+                    item.setOrderId(
+                            resultSet.getLong("order_id")
+                    );
+
+                    item.setBuyerId(
+                            resultSet.getLong("buyer_id")
+                    );
+
+                    item.setBuyerName(
+                            resultSet.getString("buyer_name")
+                    );
+
+                    item.setStatus(
+                            resultSet.getString("status")
+                    );
+
+                    item.setPaymentStatus(
+                            resultSet.getString("payment_status")
+                    );
+
+                    item.setProductId(
+                            resultSet.getLong("product_id")
+                    );
+
+                    item.setProductName(
+                            resultSet.getString("product_name")
+                    );
+
+                    item.setQuantity(
+                            resultSet.getInt("quantity")
+                    );
+
+                    item.setUnitPrice(
+                            resultSet.getBigDecimal("unit_price")
+                    );
+
+                    item.setSubtotal(
+                            resultSet.getBigDecimal("subtotal")
+                    );
+
+                    item.setOrderTotal(
+                            resultSet.getBigDecimal("order_total")
+                    );
+
+                    Timestamp timestamp =
+                            resultSet.getTimestamp("created_at");
+
+                    if (timestamp != null) {
+                        item.setCreatedAt(
+                                timestamp.toLocalDateTime()
+                        );
+                    }
+
+                    orders.add(item);
+                }
+            }
+        }
+
+        return orders;
+    }
+
+    private Order mapOrder(ResultSet resultSet)
+            throws SQLException {
+
+        Order order = new Order();
+
+        order.setId(
+                resultSet.getLong("id")
+        );
+
+        order.setBuyerId(
+                resultSet.getLong("buyer_id")
+        );
+
+        order.setStatus(
+                resultSet.getString("status")
+        );
+
+        order.setTotalAmount(
+                resultSet.getBigDecimal("total_amount")
+        );
+
+        Timestamp timestamp =
+                resultSet.getTimestamp("created_at");
+
+        if (timestamp != null) {
+            order.setCreatedAt(
+                    timestamp.toLocalDateTime()
+            );
+        }
+
+        return order;
     }
 
     private record CartRow(

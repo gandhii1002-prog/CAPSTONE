@@ -76,6 +76,10 @@
         <a href="products.jsp">
             Continue Shopping
         </a>
+        |
+        <a href="orders.jsp">
+            My Orders
+        </a>
     </p>
 
     <div id="message" class="message"></div>
