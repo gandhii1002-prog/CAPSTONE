@@ -92,7 +92,15 @@
 
 <header>
     <h1>GandhiMart</h1>
-    <p>Browse Products</p>
+    <p>
+        <a href="login.jsp">
+            Login
+        </a>
+        |
+        <a href="cart.jsp">
+            My Cart
+        </a>
+    </p>
 </header>
 
 <div class="container">
@@ -249,10 +257,20 @@
             stock.textContent =
                 "Stock: " + product.stock;
 
+            const addButton =
+                document.createElement("button");
+
+            addButton.textContent =
+                "Add to Cart";
+
+            addButton.onclick =
+                () => addToCart(product.id);
+
             card.appendChild(name);
             card.appendChild(description);
             card.appendChild(price);
             card.appendChild(stock);
+            card.appendChild(addButton);
 
             container.appendChild(card);
         });
@@ -265,6 +283,63 @@
         document.getElementById("maxPrice").value = "";
 
         loadProducts();
+    }
+
+    async function addToCart(productId) {
+
+        const quantity =
+            prompt(
+                "Enter quantity:",
+                "1"
+            );
+
+        if (quantity === null) {
+            return;
+        }
+
+        const formData =
+            new URLSearchParams();
+
+        formData.append(
+            "productId",
+            productId
+        );
+
+        formData.append(
+            "quantity",
+            quantity
+        );
+
+        try {
+
+            const response =
+                await fetch(
+                    "api/v1/cart/add",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded"
+                        },
+                        body: formData
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            alert(
+                data.message ||
+                data.error ||
+                "Cart operation completed"
+            );
+
+        } catch (error) {
+
+            alert(
+                "Unable to add product to cart"
+            );
+        }
     }
 
     loadProducts();
