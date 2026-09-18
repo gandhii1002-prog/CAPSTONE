@@ -4,8 +4,13 @@ import com.gandhimart.model.Product;
 import com.gandhimart.util.DatabaseConfig;
 
 import javax.sql.DataSource;
+
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,11 +78,12 @@ public class ProductDAOImpl implements ProductDAO {
     @Override
     public void delete(Long productId, Long sellerId) throws SQLException {
 
-        String sql = """
-                DELETE FROM products
-                WHERE id = ?
-                  AND seller_id = ?
-                """;
+                String sql = """
+                                UPDATE products
+                                SET active = FALSE
+                                WHERE id = ?
+                                    AND seller_id = ?
+                                """;
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement =
@@ -86,7 +92,11 @@ public class ProductDAOImpl implements ProductDAO {
             statement.setLong(1, productId);
             statement.setLong(2, sellerId);
 
-            statement.executeUpdate();
+            int updated = statement.executeUpdate();
+
+            if (updated != 1) {
+                throw new SQLException("Product not found");
+            }
         }
     }
 
@@ -101,9 +111,11 @@ public class ProductDAOImpl implements ProductDAO {
                        description,
                        price,
                        stock_quantity,
+                       active,
                        created_at
                 FROM products
                 WHERE id = ?
+                  AND active = TRUE
                 """;
 
         try (Connection connection = dataSource.getConnection();
@@ -169,10 +181,12 @@ public class ProductDAOImpl implements ProductDAO {
                        description,
                        price,
                        stock_quantity,
+                      active,
                        created_at
                 FROM products
-                ORDER BY created_at DESC
-                """;
+                  WHERE active = TRUE
+                  ORDER BY created_at DESC
+                  """;
 
         List<Product> products = new ArrayList<>();
 
@@ -202,9 +216,10 @@ public class ProductDAOImpl implements ProductDAO {
                        description,
                        price,
                        stock_quantity,
+                       active,
                        created_at
                 FROM products
-                WHERE 1 = 1
+                WHERE active = TRUE
                 """);
 
         List<Object> parameters = new ArrayList<>();
@@ -269,6 +284,10 @@ public class ProductDAOImpl implements ProductDAO {
         );
         product.setStock(
                 resultSet.getInt("stock_quantity")
+        );
+
+        product.setActive(
+            resultSet.getBoolean("active")
         );
 
         Timestamp timestamp =

@@ -11,6 +11,7 @@ public class Product {
     private String description;
     private BigDecimal price;
     private Integer stock;
+    private Boolean active;
     private LocalDateTime createdAt;
 
     public Product() {
@@ -62,6 +63,14 @@ public class Product {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public LocalDateTime getCreatedAt() {
