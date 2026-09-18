@@ -75,6 +75,38 @@
             color: #555;
         }
 
+        .rating {
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
+        .review-section {
+            margin-top: 15px;
+            border-top: 1px solid #ddd;
+            padding-top: 12px;
+        }
+
+        .review {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f8f8;
+            border-radius: 5px;
+        }
+
+        .review-author {
+            font-weight: bold;
+        }
+
+        .review-comment {
+            margin-top: 5px;
+            white-space: pre-wrap;
+        }
+
+        .no-reviews {
+            color: #666;
+            font-size: 14px;
+        }
+
         .error {
             color: #b00020;
             margin-bottom: 15px;
@@ -266,14 +298,97 @@
             addButton.onclick =
                 () => addToCart(product.id);
 
+                const rating = document.createElement("div");
+                rating.className = "rating";
+                rating.textContent = "Loading rating...";
+
+                const reviewSection = document.createElement("div");
+                reviewSection.className = "review-section";
+
             card.appendChild(name);
             card.appendChild(description);
             card.appendChild(price);
             card.appendChild(stock);
             card.appendChild(addButton);
+            card.appendChild(rating);
+            card.appendChild(reviewSection);
 
             container.appendChild(card);
+
+            loadProductReviews(product.id, rating, reviewSection);
         });
+    }
+
+    async function loadProductReviews(
+            productId,
+            ratingElement,
+            reviewContainer) {
+
+        try {
+            const response = await fetch(
+                    "api/v1/reviews?productId=" +
+                    encodeURIComponent(productId));
+            const data = await response.json();
+
+            if (!response.ok) {
+                ratingElement.textContent = "Rating unavailable";
+                return;
+            }
+
+            const average = Number(data.averageRating || 0);
+            const count = Number(data.count || 0);
+
+            ratingElement.textContent = count === 0
+                    ? "No reviews yet"
+                    : "★ " + average.toFixed(1) + " / 5 (" + count +
+                      " review" + (count === 1 ? "" : "s") + ")";
+
+            renderReviews(data.reviews || [], reviewContainer);
+        } catch (error) {
+            ratingElement.textContent = "Rating unavailable";
+        }
+    }
+
+    function renderReviews(reviews, container) {
+
+        container.innerHTML = "";
+
+        if (!reviews || reviews.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "no-reviews";
+            empty.textContent = "No reviews yet.";
+            container.appendChild(empty);
+            return;
+        }
+
+        reviews.slice(0, 3).forEach(review => {
+            const item = document.createElement("div");
+            item.className = "review";
+
+            const author = document.createElement("div");
+            author.className = "review-author";
+            author.textContent = review.reviewerName || "Buyer";
+
+            const stars = document.createElement("div");
+            const rating = Number(review.rating);
+            stars.textContent = "★".repeat(rating) + "☆".repeat(5 - rating);
+
+            const comment = document.createElement("div");
+            comment.className = "review-comment";
+            comment.textContent = review.comment || "";
+
+            item.appendChild(author);
+            item.appendChild(stars);
+            item.appendChild(comment);
+            container.appendChild(item);
+        });
+
+        if (reviews.length > 3) {
+            const more = document.createElement("div");
+            more.className = "no-reviews";
+            more.textContent = "Showing the latest 3 reviews.";
+            container.appendChild(more);
+        }
     }
 
     function clearFilters() {

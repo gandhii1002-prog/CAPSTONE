@@ -36,6 +36,13 @@ public class MigrationRunner {
                     "Add active status to products",
                     "db/migrations/V2__add_product_active_status.sql"
             );
+
+                runMigration(
+                    connection,
+                    "V3",
+                    "Add product reviews and ratings",
+                    "db/migrations/V3__add_reviews_table.sql"
+                );
         } catch (Exception e) {
             throw new RuntimeException(
                     "Database migration failed.",
