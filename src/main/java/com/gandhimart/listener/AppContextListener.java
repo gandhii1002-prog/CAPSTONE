@@ -1,5 +1,7 @@
 package com.gandhimart.listener;
 
+import com.gandhimart.dao.UserDAOImpl;
+import com.gandhimart.service.AdminSeedService;
 import com.gandhimart.util.DatabaseConfig;
 import com.gandhimart.util.MigrationRunner;
 
@@ -8,35 +10,66 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 @WebListener
-public class AppContextListener implements ServletContextListener {
+public class AppContextListener
+        implements ServletContextListener {
 
     @Override
-    public void contextInitialized(ServletContextEvent event) {
+    public void contextInitialized(
+            ServletContextEvent event) {
 
-        System.out.println("========================================");
-        System.out.println("GandhiMart application starting...");
-        System.out.println("========================================");
+        System.out.println(
+                "========================================"
+        );
+
+        System.out.println(
+                "GandhiMart application starting..."
+        );
+
+        System.out.println(
+                "========================================"
+        );
 
         try {
 
-            // STEP 1: Initialize database
             DatabaseConfig.initialize();
 
-            // STEP 2: Run database migrations
             MigrationRunner.runMigrations(
                     DatabaseConfig.getDataSource()
             );
 
-            System.out.println("========================================");
-            System.out.println("Database migrations completed.");
-            System.out.println("GandhiMart application started.");
-            System.out.println("========================================");
+            AdminSeedService.seed(
+                    new UserDAOImpl()
+            );
+
+            System.out.println(
+                    "========================================"
+            );
+
+            System.out.println(
+                    "Database migrations completed."
+            );
+
+            System.out.println(
+                    "GandhiMart application started."
+            );
+
+            System.out.println(
+                    "========================================"
+            );
 
         } catch (Exception e) {
 
-            System.err.println("========================================");
-            System.err.println("GandhiMart startup failed.");
-            System.err.println("========================================");
+            System.err.println(
+                    "========================================"
+            );
+
+            System.err.println(
+                    "GandhiMart startup failed."
+            );
+
+            System.err.println(
+                    "========================================"
+            );
 
             e.printStackTrace();
 
@@ -48,12 +81,17 @@ public class AppContextListener implements ServletContextListener {
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent event) {
+    public void contextDestroyed(
+            ServletContextEvent event) {
 
-        System.out.println("GandhiMart application stopping...");
+        System.out.println(
+                "GandhiMart application stopping..."
+        );
 
         DatabaseConfig.close();
 
-        System.out.println("GandhiMart application stopped.");
+        System.out.println(
+                "GandhiMart application stopped."
+        );
     }
 }
