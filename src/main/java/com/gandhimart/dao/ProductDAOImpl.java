@@ -32,8 +32,8 @@ public class ProductDAOImpl implements ProductDAO {
 
         String sql = """
                 INSERT INTO products
-                (seller_id, name, description, price, stock_quantity)
-                VALUES (?, ?, ?, ?, ?)
+                (seller_id, name, description, price, stock_quantity, category)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection connection = dataSource.getConnection();
@@ -45,6 +45,7 @@ public class ProductDAOImpl implements ProductDAO {
             statement.setString(3, product.getDescription());
             statement.setBigDecimal(4, product.getPrice());
             statement.setInt(5, product.getStock());
+            statement.setString(6, product.getCategory());
 
             statement.executeUpdate();
         }
@@ -59,6 +60,7 @@ public class ProductDAOImpl implements ProductDAO {
                     description = ?,
                     price = ?,
                     stock_quantity = ?,
+                    category = ?,
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
                   AND seller_id = ?
@@ -72,8 +74,9 @@ public class ProductDAOImpl implements ProductDAO {
             statement.setString(2, product.getDescription());
             statement.setBigDecimal(3, product.getPrice());
             statement.setInt(4, product.getStock());
-            statement.setLong(5, product.getId());
-            statement.setLong(6, product.getSellerId());
+            statement.setString(5, product.getCategory());
+            statement.setLong(6, product.getId());
+            statement.setLong(7, product.getSellerId());
 
             statement.executeUpdate();
         }
@@ -115,6 +118,7 @@ public class ProductDAOImpl implements ProductDAO {
                        description,
                        price,
                        stock_quantity,
+                       category,
                        active,
                        created_at
                 FROM products
@@ -150,6 +154,8 @@ public class ProductDAOImpl implements ProductDAO {
                        description,
                        price,
                        stock_quantity,
+                       category,
+                      active,
                        created_at
                 FROM products
                 WHERE seller_id = ?
@@ -185,7 +191,8 @@ public class ProductDAOImpl implements ProductDAO {
                        description,
                        price,
                        stock_quantity,
-                      active,
+                       category,
+                       active,
                        created_at
                 FROM products
                   WHERE active = TRUE
@@ -213,6 +220,25 @@ public class ProductDAOImpl implements ProductDAO {
             BigDecimal minPrice,
             BigDecimal maxPrice) throws SQLException {
 
+        return search(
+            keyword,
+            null,
+            minPrice,
+            maxPrice,
+            false,
+            "NEWEST"
+        );
+        }
+
+        @Override
+        public List<Product> search(
+            String keyword,
+            String category,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            boolean inStockOnly,
+            String sort) throws SQLException {
+
         StringBuilder sql = new StringBuilder("""
                 SELECT id,
                        seller_id,
@@ -220,6 +246,7 @@ public class ProductDAOImpl implements ProductDAO {
                        description,
                        price,
                        stock_quantity,
+                   category,
                        active,
                        created_at
                 FROM products
@@ -235,6 +262,11 @@ public class ProductDAOImpl implements ProductDAO {
             );
         }
 
+        if (category != null && !category.trim().isEmpty()) {
+            sql.append(" AND LOWER(category) = ?");
+            parameters.add(category.trim().toLowerCase());
+        }
+
         if (minPrice != null) {
             sql.append(" AND price >= ?");
             parameters.add(minPrice);
@@ -245,7 +277,15 @@ public class ProductDAOImpl implements ProductDAO {
             parameters.add(maxPrice);
         }
 
-        sql.append(" ORDER BY created_at DESC");
+        if (inStockOnly) {
+            sql.append(" AND stock_quantity > 0");
+        }
+
+        switch (sort) {
+            case "PRICE_ASC" -> sql.append(" ORDER BY price ASC, id DESC");
+            case "PRICE_DESC" -> sql.append(" ORDER BY price DESC, id DESC");
+            default -> sql.append(" ORDER BY created_at DESC, id DESC");
+        }
 
         List<Product> products = new ArrayList<>();
 
@@ -288,6 +328,9 @@ public class ProductDAOImpl implements ProductDAO {
         );
         product.setStock(
                 resultSet.getInt("stock_quantity")
+        );
+        product.setCategory(
+            resultSet.getString("category")
         );
 
         product.setActive(

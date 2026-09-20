@@ -31,8 +31,17 @@ public class ProductListServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         String keyword = request.getParameter("keyword");
+        String category = request.getParameter("category");
         String minPriceValue = request.getParameter("minPrice");
         String maxPriceValue = request.getParameter("maxPrice");
+        boolean inStockOnly = "true".equalsIgnoreCase(
+            request.getParameter("inStock")
+        );
+        String sort = request.getParameter("sort");
+
+        if (sort == null || sort.trim().isEmpty()) {
+            sort = "NEWEST";
+        }
 
         try {
             BigDecimal minPrice = parsePrice(minPriceValue);
@@ -42,7 +51,10 @@ public class ProductListServlet extends HttpServlet {
 
             if ((keyword == null || keyword.trim().isEmpty())
                     && minPrice == null
-                    && maxPrice == null) {
+                    && maxPrice == null
+                    && (category == null || category.trim().isEmpty())
+                    && !inStockOnly
+                    && "NEWEST".equals(sort)) {
 
                 products = productService.getAllProducts();
 
@@ -50,8 +62,11 @@ public class ProductListServlet extends HttpServlet {
 
                 products = productService.searchProducts(
                         keyword,
+                        category,
                         minPrice,
-                        maxPrice
+                        maxPrice,
+                        inStockOnly,
+                        sort
                 );
             }
 
@@ -124,6 +139,9 @@ public class ProductListServlet extends HttpServlet {
                     .append("\"price\":")
                     .append(product.getPrice())
                     .append(",")
+                    .append("\"category\":\"")
+                    .append(escapeJson(product.getCategory()))
+                    .append("\",")
                     .append("\"stock\":")
                     .append(product.getStock())
                     .append("}");

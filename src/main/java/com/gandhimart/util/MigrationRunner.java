@@ -42,7 +42,14 @@ public class MigrationRunner {
                     "V3",
                     "Add product reviews and ratings",
                     "db/migrations/V3__add_reviews_table.sql"
-                );
+                    );
+
+                    runMigration(
+                        connection,
+                        "V4",
+                        "Add database hardening and browse indexes",
+                        "db/migrations/V4__harden_browse_indexes.sql"
+                    );
         } catch (Exception e) {
             throw new RuntimeException(
                     "Database migration failed.",

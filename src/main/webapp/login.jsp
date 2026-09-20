@@ -97,6 +97,11 @@
         </a>
     </p>
 
+    <p>
+        Don't have an account?
+        <a href="register.jsp">Create an account</a>
+    </p>
+
 </div>
 
 <script>

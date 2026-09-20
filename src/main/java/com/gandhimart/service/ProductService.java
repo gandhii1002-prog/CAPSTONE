@@ -190,6 +190,24 @@ public List<Product> searchProducts(
         BigDecimal minPrice,
         BigDecimal maxPrice) throws SQLException {
 
+    return searchProducts(
+        keyword,
+        null,
+        minPrice,
+        maxPrice,
+        false,
+        "NEWEST"
+    );
+    }
+
+    public List<Product> searchProducts(
+        String keyword,
+        String category,
+        BigDecimal minPrice,
+        BigDecimal maxPrice,
+        boolean inStockOnly,
+        String sort) throws SQLException {
+
     if (minPrice != null &&
             minPrice.compareTo(BigDecimal.ZERO) < 0) {
         throw new IllegalArgumentException(
@@ -212,10 +230,22 @@ public List<Product> searchProducts(
         );
     }
 
+    if (sort == null ||
+        !(sort.equals("NEWEST") ||
+            sort.equals("PRICE_ASC") ||
+            sort.equals("PRICE_DESC"))) {
+        throw new IllegalArgumentException(
+            "Invalid product sort"
+        );
+    }
+
     return productDAO.search(
             keyword,
+        category,
             minPrice,
-            maxPrice
+        maxPrice,
+        inStockOnly,
+        sort
     );
 }
 }

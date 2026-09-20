@@ -48,6 +48,11 @@ public class H2TestDatabase {
                     connection,
                     "db/migrations/V3__add_reviews_table.sql"
             );
+
+            runMigration(
+                    connection,
+                    "db/migrations/V4__harden_browse_indexes.sql"
+            );
         }
 
         return dataSource;

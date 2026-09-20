@@ -34,11 +34,16 @@
             margin-bottom: 25px;
         }
 
-        .filters input {
+        .filters input,
+        .filters select {
             padding: 10px;
             margin: 5px;
             border: 1px solid #ccc;
             border-radius: 4px;
+        }
+
+        .stock-filter {
+            margin: 5px;
         }
 
         .filters button {
@@ -144,6 +149,11 @@
                 placeholder="Search products">
 
         <input
+            type="text"
+            id="category"
+            placeholder="Category">
+
+        <input
                 type="number"
                 id="minPrice"
                 placeholder="Min price"
@@ -156,6 +166,19 @@
                 placeholder="Max price"
                 min="0"
                 step="0.01">
+
+        <label class="stock-filter">
+            <input
+                    type="checkbox"
+                    id="inStock">
+            In-stock only
+        </label>
+
+        <select id="sort">
+            <option value="NEWEST">Newest</option>
+            <option value="PRICE_ASC">Price: Low to High</option>
+            <option value="PRICE_DESC">Price: High to Low</option>
+        </select>
 
         <button onclick="loadProducts()">
             Search
@@ -186,10 +209,23 @@
         const maxPrice =
             document.getElementById("maxPrice").value.trim();
 
+        const category =
+            document.getElementById("category").value.trim();
+
+        const inStock =
+            document.getElementById("inStock").checked;
+
+        const sort =
+            document.getElementById("sort").value;
+
         const params = new URLSearchParams();
 
         if (keyword) {
             params.append("keyword", keyword);
+        }
+
+        if (category) {
+            params.append("category", category);
         }
 
         if (minPrice) {
@@ -198,6 +234,14 @@
 
         if (maxPrice) {
             params.append("maxPrice", maxPrice);
+        }
+
+        if (inStock) {
+            params.append("inStock", "true");
+        }
+
+        if (sort !== "NEWEST") {
+            params.append("sort", sort);
         }
 
         const url =
@@ -394,8 +438,11 @@
     function clearFilters() {
 
         document.getElementById("keyword").value = "";
+        document.getElementById("category").value = "";
         document.getElementById("minPrice").value = "";
         document.getElementById("maxPrice").value = "";
+        document.getElementById("inStock").checked = false;
+        document.getElementById("sort").value = "NEWEST";
 
         loadProducts();
     }

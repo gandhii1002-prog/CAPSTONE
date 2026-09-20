@@ -164,6 +164,40 @@ class ProductDAOImplTest {
         );
     }
 
+        @Test
+        void searchShouldFilterCategoryStockAndSortByPrice()
+                        throws Exception {
+
+                Product inStock = new Product();
+                inStock.setSellerId(1L);
+                inStock.setName("Fresh Apples");
+                inStock.setCategory("Groceries");
+                inStock.setPrice(new BigDecimal("10.00"));
+                inStock.setStock(5);
+                productDAO.create(inStock);
+
+                Product outOfStock = new Product();
+                outOfStock.setSellerId(1L);
+                outOfStock.setName("Fresh Bananas");
+                outOfStock.setCategory("Groceries");
+                outOfStock.setPrice(new BigDecimal("5.00"));
+                outOfStock.setStock(0);
+                productDAO.create(outOfStock);
+
+                List<Product> results = productDAO.search(
+                                "fresh",
+                                "groceries",
+                                null,
+                                null,
+                                true,
+                                "PRICE_ASC"
+                );
+
+                assertEquals(1, results.size());
+                assertEquals("Fresh Apples", results.get(0).getName());
+                assertEquals("Groceries", results.get(0).getCategory());
+        }
+
     @Test
     void inactiveProductShouldNotAppearInBuyerListing()
             throws Exception {

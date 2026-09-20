@@ -26,4 +26,13 @@ public interface ProductDAO {
             BigDecimal minPrice,
             BigDecimal maxPrice
     ) throws SQLException;
+
+        List<Product> search(
+            String keyword,
+            String category,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            boolean inStockOnly,
+            String sort
+        ) throws SQLException;
 }
