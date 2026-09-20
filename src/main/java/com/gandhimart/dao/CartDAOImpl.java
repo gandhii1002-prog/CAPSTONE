@@ -17,7 +17,11 @@ public class CartDAOImpl implements CartDAO {
     private final DataSource dataSource;
 
     public CartDAOImpl() {
-        this.dataSource = DatabaseConfig.getDataSource();
+        this(DatabaseConfig.getDataSource());
+    }
+
+    public CartDAOImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override

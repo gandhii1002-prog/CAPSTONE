@@ -19,7 +19,11 @@ public class AdminDAOImpl implements AdminDAO {
     private final DataSource dataSource;
 
     public AdminDAOImpl() {
-        this.dataSource = DatabaseConfig.getDataSource();
+                this(DatabaseConfig.getDataSource());
+        }
+
+        public AdminDAOImpl(DataSource dataSource) {
+                this.dataSource = dataSource;
     }
 
     @Override

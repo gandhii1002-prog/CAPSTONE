@@ -21,7 +21,11 @@ public class ReviewDAOImpl implements ReviewDAO {
     private final DataSource dataSource;
 
     public ReviewDAOImpl() {
-        this.dataSource = DatabaseConfig.getDataSource();
+        this(DatabaseConfig.getDataSource());
+    }
+
+    public ReviewDAOImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override

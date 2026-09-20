@@ -20,7 +20,11 @@ public class OrderDAOImpl implements OrderDAO {
     private final DataSource dataSource;
 
     public OrderDAOImpl() {
-        this.dataSource = DatabaseConfig.getDataSource();
+                this(DatabaseConfig.getDataSource());
+        }
+
+        public OrderDAOImpl(DataSource dataSource) {
+                this.dataSource = dataSource;
     }
 
     @Override

@@ -12,7 +12,11 @@ public class UserDAOImpl implements UserDAO {
     private final DataSource dataSource;
 
     public UserDAOImpl() {
-        this.dataSource = DatabaseConfig.getDataSource();
+        this(DatabaseConfig.getDataSource());
+    }
+
+    public UserDAOImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override

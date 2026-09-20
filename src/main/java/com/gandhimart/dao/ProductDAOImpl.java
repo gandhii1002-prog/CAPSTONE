@@ -20,7 +20,11 @@ public class ProductDAOImpl implements ProductDAO {
     private final DataSource dataSource;
 
     public ProductDAOImpl() {
-        this.dataSource = DatabaseConfig.getDataSource();
+        this(DatabaseConfig.getDataSource());
+    }
+
+    public ProductDAOImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override

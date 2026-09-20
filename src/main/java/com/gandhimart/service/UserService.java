@@ -43,7 +43,7 @@ public class UserService {
 
         if (userDAO.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException(
-                    "Email is already registered"
+                    "Email already registered"
             );
         }
 
