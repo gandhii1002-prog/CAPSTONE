@@ -321,35 +321,7 @@ https://lively-generosity-production-3b55.up.railway.app
 
 ---
 
-## 14. Screenshots
-
-Add project screenshots before final submission.
-
-Recommended screenshots:
-
-1. Home page
-2. Registration page
-3. Login page
-4. Product browsing page
-5. Product filtering
-6. Seller product management
-7. Shopping cart
-8. Checkout
-9. Buyer order history
-10. Seller order page
-11. Admin panel
-12. Product reviews and ratings
-13. Railway deployed application
-
-Example:
-
-```markdown
-![Home Page](docs/screenshots/home.png)
-```
-
----
-
-## 15. Known Limitations / Pending Work
+## 14. Known Limitations / Pending Work
 
 * Railway database persistence across a full restart/redeploy still requires final verification.
 * Structured request-ID logging should be verified against the final codebase.
@@ -358,18 +330,7 @@ Example:
 
 ---
 
-## 16. Documentation
-
-Additional project documentation:
-
-* [Technical Documentation](DOCUMENTATION.md)
-* [API Documentation](API.md)
-* [Contributing Guide](CONTRIBUTING.md)
-* [Changelog](CHANGELOG.md)
-
----
-
-## 17. Academic Context
+## 15. Academic Context
 
 This project is developed as a Java Semester 3 capstone project following the specified requirements for:
 
@@ -385,6 +346,6 @@ This project is developed as a Java Semester 3 capstone project following the sp
 
 ---
 
-## 18. License
+## 16. License
 
 This project is developed for academic and educational purposes.
