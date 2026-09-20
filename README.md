@@ -91,8 +91,9 @@ GandhiMart follows a **Layered MVC architecture over Java Servlets**.
 └──────────────┬───────────────┘
                ▼
 ┌──────────────────────────────┐
-│          DAO Layer            │
-│ JDBC + PreparedStatement      │
+│          DAO Layer           │
+│ JDBC + PreparedStatement    <img width="1139" height="2665" alt="mermaid-diagram-2" src="https://github.com/user-attachments/assets/5fc0c690-6f23-4215-95b7-999c89151452" />
+ │
 └──────────────┬───────────────┘
                ▼
 ┌──────────────────────────────┐
@@ -110,15 +111,15 @@ GandhiMart follows a **Layered MVC architecture over Java Servlets**.
 
 ### D1 – Entity Relationship Diagram
 
-[D1 ER Diagram](docs/diagrams/D1_ER_Diagram.md)
+[D1 ER Diagram] https://kommodo.ai/i/jIqcjfokmnmzC3ykDzUG
 
 ### D2 – Use Case Diagram
 
-[D2 Use Case Diagram](docs/diagrams/D2_Use_Case_Diagram.md)
+[D2 Use Case Diagram] https://kommodo.ai/i/gMrzTTPbLVmux9EzExka
 
 ### D3 – Place Order Sequence Diagram
 
-[D3 Place Order Sequence Diagram](docs/diagrams/D3_Place_Order_Sequence.md)
+[D3 Place Order Sequence Diagram] https://kommodo.ai/i/2iSA6gYZxsZFQB33sKJF
 
 ---
 
