@@ -92,8 +92,8 @@ GandhiMart follows a **Layered MVC architecture over Java Servlets**.
                ▼
 ┌──────────────────────────────┐
 │          DAO Layer           │
-│ JDBC + PreparedStatement    <img width="1139" height="2665" alt="mermaid-diagram-2" src="https://github.com/user-attachments/assets/5fc0c690-6f23-4215-95b7-999c89151452" />
- │
+│ JDBC + PreparedStatement     │
+│                              │
 └──────────────┬───────────────┘
                ▼
 ┌──────────────────────────────┐
