@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
+
 import java.io.File;
 
 public class DatabaseConfig {
@@ -20,10 +21,8 @@ public class DatabaseConfig {
         }
 
         try {
-            // Store the H2 database in the user's home directory.
-            // This avoids the previous "/db: Read-only file system" problem.
             String dbDirectory =
-                    System.getProperty("user.home") + File.separator + "gandhimart-db";
+                    resolveDatabaseDirectory();
 
             File directory = new File(dbDirectory);
 
@@ -43,8 +42,20 @@ public class DatabaseConfig {
             HikariConfig config = new HikariConfig();
 
             config.setJdbcUrl(jdbcUrl);
-            config.setUsername("sa");
-            config.setPassword("");
+                config.setUsername(
+                    System.getenv()
+                        .getOrDefault(
+                            "GANDHIMART_DB_USER",
+                            "sa"
+                        )
+                );
+                config.setPassword(
+                    System.getenv()
+                        .getOrDefault(
+                            "GANDHIMART_DB_PASSWORD",
+                            ""
+                        )
+                );
             config.setDriverClassName("org.h2.Driver");
 
             config.setMaximumPoolSize(5);
@@ -52,21 +63,44 @@ public class DatabaseConfig {
 
             dataSource = new HikariDataSource(config);
 
-            System.out.println("========================================");
-            System.out.println("GandhiMart database initialized");
-            System.out.println("Database URL: " + jdbcUrl);
-            System.out.println("========================================");
+            System.out.println("GandhiMart database initialized.");
+            System.out.println("Database directory: " + dbDirectory);
 
         } catch (Exception e) {
             System.err.println("Failed to initialize GandhiMart database.");
-            e.printStackTrace();
-
             throw new RuntimeException(
                     "Database initialization failed.",
                     e
             );
         }
     }
+
+        private static String resolveDatabaseDirectory() {
+
+        String configuredDirectory =
+            System.getenv("GANDHIMART_DB_DIR");
+
+        if (configuredDirectory != null &&
+            !configuredDirectory.trim().isEmpty()) {
+
+            return configuredDirectory.trim();
+        }
+
+        String railwayVolumePath =
+            System.getenv("RAILWAY_VOLUME_MOUNT_PATH");
+
+        if (railwayVolumePath != null &&
+            !railwayVolumePath.trim().isEmpty()) {
+
+            return railwayVolumePath.trim()
+                + File.separator
+                + "gandhimart-db";
+        }
+
+        return System.getProperty("user.home")
+            + File.separator
+            + "gandhimart-db";
+        }
 
     public static DataSource getDataSource() {
 
