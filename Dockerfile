@@ -14,7 +14,7 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 
 COPY --from=builder \
     /app/target/gandhimart.war \
-    /usr/local/tomcat/webapps/gandhimart.war
+    /usr/local/tomcat/webapps/ROOT.war
 
 COPY docker/start-gandhimart.sh \
     /usr/local/bin/start-gandhimart.sh
