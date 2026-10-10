@@ -13,10 +13,10 @@
 ## Live Application
 
 **Production URL:**
-https://lively-generosity-production-3b55.up.railway.app
+https://gandhimart.onrender.com
 
 **Health Check:**
-https://lively-generosity-production-3b55.up.railway.app/api/v1/health
+https://gandhimart.onrender.com/api/v1/health
 
 ---
 
@@ -40,7 +40,7 @@ The application is designed using a layered architecture to separate presentatio
 * Implement database persistence using H2.
 * Apply layered MVC architecture with DAO and Service layers.
 * Implement automated testing and CI verification.
-* Deploy the application publicly using Railway.
+* Deploy the application publicly using Render.
 
 ---
 
@@ -304,11 +304,11 @@ http://localhost:8080/gandhimart/
 
 ## 13. Deployment
 
-GandhiMart is packaged as a WAR and deployed using a Tomcat 9 Docker environment on Railway.
+GandhiMart is packaged as a WAR and deployed using a Tomcat 9 Docker environment on Render.
 
 ### Production URL
 
-https://lively-generosity-production-3b55.up.railway.app
+https://gandhimart.onrender.com
 
 ### Health response
 
@@ -323,7 +323,7 @@ https://lively-generosity-production-3b55.up.railway.app
 
 ## 14. Known Limitations / Pending Work
 
-* Railway database persistence across a full restart/redeploy still requires final verification.
+* Render database persistence across a full restart/redeploy still requires final verification.
 * Structured request-ID logging should be verified against the final codebase.
 * AI chatbot integration is a Final Review deliverable.
 * Final regression testing and presentation materials remain part of the final submission process.
